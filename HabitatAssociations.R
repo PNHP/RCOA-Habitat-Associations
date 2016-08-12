@@ -71,8 +71,6 @@ CaveInvertebrates <- readLines("CaveInvertebrates.csv")
 # reads the habitat proportions in
 # data should be a csv file with the following format: ES_NAME,area_meters,acres,proportion
 # pick one of the following sets:
-# 1 *****
-## habitat <- read.csv("A1_Habitat_DSLDistance.csv", na.strings=c("NA")) # just the DSL
 # 2 *****
 #habitat <- read.csv("A1_Habitat_DSLDistanceNew.csv", na.strings=c("NA")) # DSL and Distance to Water
 #habitat$habitatcode <- paste(habitat$BaseHabitatData1,habitat$BaseHabitatData2, sep="_")
@@ -80,10 +78,10 @@ CaveInvertebrates <- readLines("CaveInvertebrates.csv")
 #habitat <- read.csv("Habitat_NEAHC_HUC6.csv", na.strings = c("NA")) # Aquatic Habitat and HUC6
 #habitat$habitatcode <- paste(habitat$BaseHabitatData1,habitat$BaseHabitatData2, sep="_")
 # 6 ***** Aquatic Habitat Regional
-habitat <- read.csv("Habitat_NEAHC.csv", na.strings = c("NA")) # Aquatic Habitat
+#habitat <- read.csv("Habitat_NEAHC.csv", na.strings = c("NA")) # Aquatic Habitat
 # 8 ***** DSL only - This is the terrestrial regional one
-##habitat <- read.csv("Habitat_DSLDistanceHUC06.csv", na.strings=c("NA")) # DSL, Distance to Water, and HUC6
-##habitat$habitatcode <- paste(habitat$BaseHabitatData1,habitat$BaseHabitatData2,habitat$BaseHabitatData3, sep="_") 
+habitat <- read.csv("Habitat_DSLDistanceHUC06.csv", na.strings=c("NA")) # DSL, Distance to Water, and HUC6
+habitat$habitatcode <- paste(habitat$BaseHabitatData1,habitat$BaseHabitatData2,habitat$BaseHabitatData3, sep="_") 
 ########## pick one of the above #######################################################################
 
 habitat <- habitat[,!(names(habitat) %in% c("OBJECTID","VALUE"))] #drop a few unneeded columns
@@ -120,7 +118,7 @@ species$HUC6 <- substr(species$HUC8,1,6)# pads zeros to make HUC8 codes 8 digits
 
 # the following section allows one to subset on a species list (i.e RSGCN)
 ### Use "SpeciesListCreator.R" to generate the list
-species <- merge(species, SpeciesList_All, by.x="ELCODE_1", by.y="ELCODE", sort = FALSE)  ##UNCOMMENT TO USE
+#species <- merge(species, SpeciesList_All, by.x="ELCODE_1", by.y="ELCODE", sort = FALSE)  ##UNCOMMENT TO USE
 #species <- merge(species, SpeciesList_SGCN, by.x="ELCODE_1", by.y="ELCODE", sort = FALSE)  ##UNCOMMENT TO USE
 # species <- merge(species, SpeciesList_Hockeystick, by.x="ELCODE_1", by.y="ELCODE", sort = FALSE)  ##UNCOMMENT TO USE
 #species <- merge(species, SpeciesList_HighHigh, by.x="ELCODE_1", by.y="ELCODE", sort = FALSE)  ##UNCOMMENT TO USE
@@ -129,7 +127,7 @@ species1 <- species # copies this over to maintain a backup. Drop rows that are 
 ##species1 <- droplevels(subset(species1,SPECIES_TYPE_1=="A")) # subsets to only include the animals ---- change "A" to "P" for Plants.
 species1 <- droplevels(subset(species1,EORANK!="X" & EORANK!="X?" &  EORANK!="H" & EORANK!="H?")) # deletes all the extirpated and historics at the EO level.
 species1 <- droplevels(subset(species1,SNAME!="MA sensitive species")) # deletes the 'MA sensitive species' records as they are mixed and we can't code them to any particular habitat
-species1 <- species1[which(species1$INFO_TAX_1=="Freshwater and Anadromous Fishes"|species1$INFO_TAX_1=="Freshwater Mussels"&species1$SNAME=="Cryptobranchus alleganiensis alleganiensis"|species1$SNAME=="Necturus maculosus"|species1$SNAME %in% LoticOdonates|species1$INFO_TAX2=="Crayfishes"|species1$INFO_TAX2=="Mayflies"|species1$INFO_TAX2=="Stoneflies"),]
+#species1 <- species1[which(species1$INFO_TAX_1=="Freshwater and Anadromous Fishes"|species1$INFO_TAX_1=="Freshwater Mussels"&species1$SNAME=="Cryptobranchus alleganiensis alleganiensis"|species1$SNAME=="Necturus maculosus"|species1$SNAME %in% LoticOdonates|species1$INFO_TAX2=="Crayfishes"|species1$INFO_TAX2=="Mayflies"|species1$INFO_TAX2=="Stoneflies"),]
 species1 <- species1[which(!species1$SNAME %in% CaveInvertebrates),] # drops all the cave invertebrates.
 species1 <- droplevels(subset(species1,hab_class_name!="Dam" & hab_class_name!="Culvert/bridge" & hab_class_name!="Track"
                               & hab_class_name!="Local road" & hab_class_name!="Active train" & hab_class_name!="Motorway"
@@ -150,9 +148,9 @@ species1$LASTYEAR <- ifelse(!is.na(species1$EO_LASTOBS_YEAR)>!is.na(species1$SF_
 species_final <- subset(species1,LASTYEAR>=1986|is.na(LASTYEAR)) # the is.na is to deal with the lack of date data from Maine
 
 # pick one of the following ####################################################################################
-#species_final$habitatcode <- paste(species_final$gridcode,species_final$DISTANCE_CAT, sep="_")
-##species_final$habitatcode <- paste(species_final$gridcode,species_final$DISTANCE_CAT,species_final$HUC6, sep="_")
- species_final$habitatcode <- species_final$SUM_23
+##species_final$habitatcode <- paste(species_final$gridcode,species_final$DISTANCE_CAT, sep="_")
+species_final$habitatcode <- paste(species_final$gridcode,species_final$DISTANCE_CAT,species_final$HUC6, sep="_")
+#species_final$habitatcode <- species_final$SUM_23
 # species_final$habitatcode <- species_final$gridcode # Just the DSL only. #8
 #species_final$habitatcode <- paste(species_final$SUM_23,species_final$HUC6, sep="_")  # NEAHC + HUC6
 # pick one of the above ########################################################################################
@@ -199,8 +197,8 @@ data_merge$WghtTimesTSS <- data_merge$minuslog*as.numeric(as.character(data_merg
 
 # creates a habitat LookUp table for the weighing below
 #### PICK ONE OF THE BELOW
-#lu_habitat <- species_final[,c("habitatcode","hab_class_name")] # for terrestrial
-lu_habitat <- species_final[,c("habitatcode","SUM_23")] # for aquatic
+lu_habitat <- species_final[,c("habitatcode","hab_class_name")] # for terrestrial
+#lu_habitat <- species_final[,c("habitatcode","SUM_23")] # for aquatic
 #### pick one of the above
 lu_habitat <- subset(lu_habitat, !duplicated(habitatcode))
 
@@ -212,7 +210,10 @@ habitat_weights <- join(habitat_weights,lu_habitat,by=c('habitatcode')) ## remov
 habitat_weights <- habitat_weights[order(-habitat_weights$weight),] # sorts in decending order
 
 # write the summarized weights to a file so we can join it to the GIS
-write.csv(habitat_weights, "OutputWeights.csv")
+write.csv(habitat_weights, "20160812_TerrAll_DSL-d2w_h6.csv")
+#data_merge <- droplevels(subset(data_merge,!is.na(WghtTimesTSS)))
+#write.csv(data_merge, "20160812_ExpObs_DSL-d2w_h6.csv")
+
 
 #Drop some unnessary files
 masterlist <- NULL
